@@ -1,0 +1,30 @@
+// Pokémon Dictionary — database schema
+
+Table AspNetUsers {
+  Id nvarchar(450) [pk]
+  UserName nvarchar(256)
+}
+
+Table Teams {
+  Id int [pk, increment]
+  Name nvarchar(256) [not null]
+  AppUserId nvarchar(450) [not null]
+
+  indexes {
+    (AppUserId, Name) [unique]
+  }
+}
+
+Table Members {
+  Id int [pk, increment]
+  PokemonId int [not null]
+  Slot int [not null, check: `Slot BETWEEN 1 AND 6`]
+  TeamId int [not null]
+
+  indexes {
+    (TeamId, Slot) [unique]
+  }
+}
+
+Ref: Teams.AppUserId > AspNetUsers.Id [delete: cascade]
+Ref: Members.TeamId > Teams.Id [delete: cascade]
