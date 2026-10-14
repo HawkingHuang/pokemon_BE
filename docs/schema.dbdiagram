@@ -24,6 +24,18 @@
         "schemaName": "public",
         "x": 12,
         "y": 342.0004574399204
+      },
+      {
+        "name": "Groups",
+        "schemaName": "public",
+        "x": 12,
+        "y": 552.0004574399204
+      },
+      {
+        "name": "GroupTeams",
+        "schemaName": "public",
+        "x": 12,
+        "y": 730.0004574399204
       }
     ],
     "tableGroupCollapseStates": [],
@@ -79,6 +91,51 @@
           "TeamId"
         ],
         "firstTableName": "Members",
+        "firstSchemaName": "public",
+        "firstRelation": "*",
+        "secondFieldNames": [
+          "Id"
+        ],
+        "secondTableName": "Teams",
+        "secondSchemaName": "public",
+        "secondRelation": "1",
+        "checkPoints": []
+      },
+      {
+        "firstFieldNames": [
+          "AppUserId"
+        ],
+        "firstTableName": "Groups",
+        "firstSchemaName": "public",
+        "firstRelation": "*",
+        "secondFieldNames": [
+          "Id"
+        ],
+        "secondTableName": "AspNetUsers",
+        "secondSchemaName": "public",
+        "secondRelation": "1",
+        "checkPoints": []
+      },
+      {
+        "firstFieldNames": [
+          "GroupId"
+        ],
+        "firstTableName": "GroupTeams",
+        "firstSchemaName": "public",
+        "firstRelation": "*",
+        "secondFieldNames": [
+          "Id"
+        ],
+        "secondTableName": "Groups",
+        "secondSchemaName": "public",
+        "secondRelation": "1",
+        "checkPoints": []
+      },
+      {
+        "firstFieldNames": [
+          "TeamId"
+        ],
+        "firstTableName": "GroupTeams",
         "firstSchemaName": "public",
         "firstRelation": "*",
         "secondFieldNames": [

@@ -5,6 +5,25 @@ Table AspNetUsers {
   UserName nvarchar(256)
 }
 
+Table GroupTeams {
+  GroupId int [not null]
+  TeamId int [not null]
+
+  indexes {
+    (GroupId, TeamId) [pk]
+  }
+}
+
+Table Groups {
+  Id int [pk, increment]
+  Name nvarchar(256) [not null]
+  AppUserId nvarchar(450) [not null]
+
+  indexes {
+    (AppUserId, Name) [unique]
+  }
+}
+
 Table Teams {
   Id int [pk, increment]
   Name nvarchar(256) [not null]
@@ -26,5 +45,9 @@ Table Members {
   }
 }
 
+
+Ref: Groups.AppUserId > AspNetUsers.Id [delete: no action]
 Ref: Teams.AppUserId > AspNetUsers.Id [delete: cascade]
 Ref: Members.TeamId > Teams.Id [delete: cascade]
+Ref: GroupTeams.GroupId > Groups.Id [delete: cascade]
+Ref: GroupTeams.TeamId > Teams.Id [delete: cascade]
