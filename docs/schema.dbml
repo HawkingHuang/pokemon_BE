@@ -5,6 +5,15 @@ Table AspNetUsers {
   UserName nvarchar(256)
 }
 
+Table RefreshTokens {
+  Id int [pk, increment]
+  TokenHash nvarchar(64) [not null, unique]
+  AppUserId nvarchar(450) [not null]
+  CreatedAt datetime2 [not null]
+  ExpiresAt datetime2 [not null]
+  RevokedAt datetime2
+}
+
 Table GroupTeams {
   GroupId int [not null]
   TeamId int [not null]
@@ -46,6 +55,7 @@ Table Members {
 }
 
 
+Ref: RefreshTokens.AppUserId > AspNetUsers.Id [delete: cascade]
 Ref: Groups.AppUserId > AspNetUsers.Id [delete: no action]
 Ref: Teams.AppUserId > AspNetUsers.Id [delete: cascade]
 Ref: Members.TeamId > Teams.Id [delete: cascade]

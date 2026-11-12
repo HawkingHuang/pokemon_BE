@@ -36,6 +36,12 @@
         "schemaName": "public",
         "x": 12,
         "y": 730.0004574399204
+      },
+      {
+        "name": "RefreshTokens",
+        "schemaName": "public",
+        "x": 12,
+        "y": 876.0004574399204
       }
     ],
     "tableGroupCollapseStates": [],
@@ -142,6 +148,21 @@
           "Id"
         ],
         "secondTableName": "Teams",
+        "secondSchemaName": "public",
+        "secondRelation": "1",
+        "checkPoints": []
+      },
+      {
+        "firstFieldNames": [
+          "AppUserId"
+        ],
+        "firstTableName": "RefreshTokens",
+        "firstSchemaName": "public",
+        "firstRelation": "*",
+        "secondFieldNames": [
+          "Id"
+        ],
+        "secondTableName": "AspNetUsers",
         "secondSchemaName": "public",
         "secondRelation": "1",
         "checkPoints": []
