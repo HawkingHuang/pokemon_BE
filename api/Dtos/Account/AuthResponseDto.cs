@@ -1,0 +1,7 @@
+namespace api.Dtos.Account;
+
+public class AuthResponseDto
+{
+    public string UserName { get; set; } = string.Empty;
+    public string AccessToken { get; set; } = string.Empty;
+}

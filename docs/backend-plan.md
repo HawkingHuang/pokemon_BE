@@ -40,23 +40,23 @@
 - [x] 前端存放：token 放在 Pinia（記憶體）；refresh token 放在 httpOnly cookie（JavaScript 讀不到）
 
 ### 工作項目
-- [ ] 安裝套件：Identity.EntityFrameworkCore、Authentication.JwtBearer，版本 `10.0.14`
-- [ ] `AppUser` 繼承 `IdentityUser`
-- [ ] `ApplicationDBContext` 改為繼承 `IdentityDbContext<AppUser>`
-- [ ] `Program.cs`：註冊 Identity 並設定密碼規則與 email 不可重複（`RequireUniqueEmail`）、改用 JWT 驗證、將 `UseAuthentication` 放在 `UseAuthorization` 之前
-- [ ] 【新】JWT 簽章金鑰存放在 user-secrets，不寫入 `appsettings.json`。repo 會推送到 GitHub，金鑰一旦外洩，任何人都能偽造 token
-- [ ] `TokenService`：產生 token
-- [ ] 註冊 API：`RegisterDto` 驗證、以 `CreateAsync` 建立使用者、回傳錯誤訊息
-- [ ] 登入 API：查詢使用者、驗證密碼（`lockoutOnFailure: true`，連續錯 5 次鎖定 5 分鐘）、回傳 token
-- [ ] 從 token 取得目前使用者的 extension method
-- [ ] `GET /api/account/me`：回傳目前登入者的 Id 與帳號
-- [ ] 【新】Model：`RefreshToken`；`TokenHash` 不可重複；刪除使用者時連帶刪除
-- [ ] 【新】登入時一併發出 refresh token：隨機字串（用 `RandomNumberGenerator` 產生，不能用 `Random`），資料庫只存雜湊，7 天後失效，以 cookie 回傳（`HttpOnly`、`Secure`、`SameSite=Strict`、`Path=/api/account`）
-- [ ] 【新】`POST /api/account/refresh`：從 cookie 讀取 refresh token 並驗證，撤銷舊的並發出新的一組；不要求有效的 token
-- [ ] 【新】`POST /api/account/logout`：撤銷 refresh token 並清除 cookie；不要求有效的 token
-- [ ] 【新】拿已撤銷的 refresh token 換新時，視為遭盜用，撤銷該使用者所有的 refresh token；撤銷未滿 30 秒的除外，改回傳 409 讓前端重試
-- [ ] 【新】換發 refresh token 時，刪除該使用者已過期的舊紀錄（已撤銷但未過期的要保留）
-- [ ] 執行 migration，建立 Identity 與 `RefreshTokens` 的資料表
+- [x] 安裝套件：Identity.EntityFrameworkCore、Authentication.JwtBearer，版本 `10.0.14`
+- [x] `AppUser` 繼承 `IdentityUser`
+- [x] `ApplicationDBContext` 改為繼承 `IdentityDbContext<AppUser>`
+- [x] `Program.cs`：註冊 Identity 並設定密碼規則與 email 不可重複（`RequireUniqueEmail`）、改用 JWT 驗證、將 `UseAuthentication` 放在 `UseAuthorization` 之前
+- [x] 【新】JWT 簽章金鑰存放在 user-secrets，不寫入 `appsettings.json`。repo 會推送到 GitHub，金鑰一旦外洩，任何人都能偽造 token
+- [x] `TokenService`：產生 token
+- [x] 註冊 API：`RegisterDto` 驗證、以 `CreateAsync` 建立使用者、回傳錯誤訊息
+- [x] 登入 API：查詢使用者、驗證密碼（`lockoutOnFailure: true`，連續錯 5 次鎖定 5 分鐘）、回傳 token
+- [x] 從 token 取得目前使用者的 extension method
+- [x] `GET /api/account/me`：回傳目前登入者的 Id 與帳號
+- [x] 【新】Model：`RefreshToken`；`TokenHash` 不可重複；刪除使用者時連帶刪除
+- [x] 【新】登入時一併發出 refresh token：隨機字串（用 `RandomNumberGenerator` 產生，不能用 `Random`），資料庫只存雜湊，7 天後失效，以 cookie 回傳（`HttpOnly`、`Secure`、`SameSite=Strict`、`Path=/api/account`）
+- [x] 【新】`POST /api/account/refresh`：從 cookie 讀取 refresh token 並驗證，撤銷舊的並發出新的一組；不要求有效的 token
+- [x] 【新】`POST /api/account/logout`：撤銷 refresh token 並清除 cookie；不要求有效的 token
+- [x] 【新】拿已撤銷的 refresh token 換新時，視為遭盜用，撤銷該使用者所有的 refresh token；撤銷未滿 30 秒的除外，改回傳 409 讓前端重試
+- [x] 【新】換發 refresh token 時，刪除該使用者已過期的舊紀錄（已撤銷但未過期的要保留）
+- [x] 執行 migration，建立 Identity 與 `RefreshTokens` 的資料表
 
 ### 完成標準
 可以註冊並登入取得 token；帶 token 呼叫 `GET /api/account/me` 能取得自己的 Id 與帳號，未帶 token 時請求會被拒絕；用 refresh token 能換到新的 token，登出後原本的 refresh token 無法再使用。
