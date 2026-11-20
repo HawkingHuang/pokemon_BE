@@ -14,19 +14,23 @@ namespace api.Controllers;
 public class TeamsController : ControllerBase
 {
     private const string DuplicateNameMessage = "You already have a team with this name.";
+    private const string GroupsNotFoundMessage = "One or more groups were not found.";
 
     private readonly ITeamRepository _teamRepo;
+    private readonly IGroupRepository _groupRepo;
 
-    public TeamsController(ITeamRepository teamRepo)
+    public TeamsController(ITeamRepository teamRepo, IGroupRepository groupRepo)
     {
         _teamRepo = teamRepo;
+        _groupRepo = groupRepo;
     }
 
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
         var teams = await _teamRepo.GetAllByUserAsync(User.GetUserId());
-        return Ok(teams.Select(t => t.ToTeamDto()));
+        var teamDtos = teams.Select(t => t.ToTeamDto()).ToList();
+        return Ok(teamDtos);
     }
 
     [HttpGet("{id:int}")]
@@ -35,38 +39,49 @@ public class TeamsController : ControllerBase
         var team = await _teamRepo.GetByIdAsync(id, User.GetUserId());
         if (team == null) return NotFound();
 
-        return Ok(team.ToTeamDto());
+        var teamDto = team.ToTeamDto();
+        return Ok(teamDto);
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] TeamRequestDto teamDto)
+    public async Task<IActionResult> Create([FromBody] TeamRequestDto request)
     {
         var userId = User.GetUserId();
-        var name = teamDto.Name.Trim();
+        var name = request.Name.Trim();
         if (await _teamRepo.NameExistsAsync(userId, name)) return Conflict(DuplicateNameMessage);
+
+        var groupIds = request.GroupIds.Distinct().ToList();
+        if (!await _groupRepo.AllExistAsync(groupIds, userId)) return NotFound(GroupsNotFoundMessage);
 
         var team = await _teamRepo.CreateAsync(new Team
         {
             Name = name,
             AppUserId = userId,
-            Members = teamDto.PokemonIds.ToMembers()
+            Members = request.PokemonIds.ToMembers(),
+            GroupTeams = groupIds.ToGroupTeams()
         });
 
-        return CreatedAtAction(nameof(GetById), new { id = team.Id }, team.ToTeamDto());
+        var teamDto = team.ToTeamDto();
+        return CreatedAtAction(nameof(GetById), new { id = team.Id }, teamDto);
     }
 
     [HttpPut("{id:int}")]
-    public async Task<IActionResult> Update([FromRoute] int id, [FromBody] TeamRequestDto teamDto)
+    public async Task<IActionResult> Update([FromRoute] int id, [FromBody] TeamRequestDto request)
     {
         var userId = User.GetUserId();
         var team = await _teamRepo.GetByIdAsync(id, userId);
         if (team == null) return NotFound();
 
-        var name = teamDto.Name.Trim();
+        var name = request.Name.Trim();
         if (await _teamRepo.NameExistsAsync(userId, name, excludeTeamId: id)) return Conflict(DuplicateNameMessage);
 
-        await _teamRepo.UpdateAsync(team, name, teamDto.PokemonIds.ToMembers());
-        return Ok(team.ToTeamDto());
+        var groupIds = request.GroupIds.Distinct().ToList();
+        if (!await _groupRepo.AllExistAsync(groupIds, userId)) return NotFound(GroupsNotFoundMessage);
+
+        await _teamRepo.UpdateAsync(team, name, request.PokemonIds.ToMembers(), groupIds.ToGroupTeams());
+
+        var teamDto = team.ToTeamDto();
+        return Ok(teamDto);
     }
 
     [HttpDelete("{id:int}")]

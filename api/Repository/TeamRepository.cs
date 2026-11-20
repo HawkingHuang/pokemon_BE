@@ -18,7 +18,18 @@ public class TeamRepository : ITeamRepository
     {
         return await _context.Teams
             .Include(t => t.Members)
+            .Include(t => t.GroupTeams)
             .Where(t => t.AppUserId == appUserId)
+            .OrderByDescending(t => t.UpdatedAt)
+            .ToListAsync();
+    }
+
+    public async Task<List<Team>> GetAllByGroupAsync(int groupId, string appUserId)
+    {
+        return await _context.Teams
+            .Include(t => t.Members)
+            .Include(t => t.GroupTeams)
+            .Where(t => t.AppUserId == appUserId && t.GroupTeams.Any(gt => gt.GroupId == groupId))
             .OrderByDescending(t => t.UpdatedAt)
             .ToListAsync();
     }
@@ -28,6 +39,7 @@ public class TeamRepository : ITeamRepository
     {
         return await _context.Teams
             .Include(t => t.Members)
+            .Include(t => t.GroupTeams)
             .FirstOrDefaultAsync(t => t.Id == id && t.AppUserId == appUserId);
     }
 
@@ -45,12 +57,15 @@ public class TeamRepository : ITeamRepository
         return team;
     }
 
-    // replaces the whole team; old members are deleted and new ones inserted in one SaveChanges
-    public async Task UpdateAsync(Team team, string name, List<Member> members)
+    // replaces the whole team; old members and group links are deleted and new ones inserted in one SaveChanges.
+    // a group link that stays is deleted and re-added with the same key; EF Core merges the two and sends nothing for it
+    public async Task UpdateAsync(Team team, string name, List<Member> members, List<GroupTeam> groupTeams)
     {
         _context.Members.RemoveRange(team.Members);
+        _context.GroupTeams.RemoveRange(team.GroupTeams);
         team.Name = name;
         team.Members = members;
+        team.GroupTeams = groupTeams;
         team.UpdatedAt = DateTime.UtcNow;
         await _context.SaveChangesAsync();
     }

@@ -13,6 +13,8 @@ public class ApplicationDBContext : IdentityDbContext<AppUser>
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
     public DbSet<Team> Teams => Set<Team>();
     public DbSet<Member> Members => Set<Member>();
+    public DbSet<Group> Groups => Set<Group>();
+    public DbSet<GroupTeam> GroupTeams => Set<GroupTeam>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -48,6 +50,34 @@ public class ApplicationDBContext : IdentityDbContext<AppUser>
             entity.HasOne(m => m.Team)
                 .WithMany(t => t.Members)
                 .HasForeignKey(m => m.TeamId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        builder.Entity<Group>(entity =>
+        {
+            entity.Property(g => g.Name).HasMaxLength(30);
+            entity.HasIndex(g => new { g.AppUserId, g.Name }).IsUnique();
+
+            // no cascade here: deleting a user already reaches GroupTeams through Teams,
+            // and SQL Server rejects a second cascade path to the same table
+            entity.HasOne(g => g.AppUser)
+                .WithMany()
+                .HasForeignKey(g => g.AppUserId)
+                .OnDelete(DeleteBehavior.NoAction);
+        });
+
+        builder.Entity<GroupTeam>(entity =>
+        {
+            entity.HasKey(gt => new { gt.GroupId, gt.TeamId });
+
+            entity.HasOne(gt => gt.Group)
+                .WithMany(g => g.GroupTeams)
+                .HasForeignKey(gt => gt.GroupId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(gt => gt.Team)
+                .WithMany(t => t.GroupTeams)
+                .HasForeignKey(gt => gt.TeamId)
                 .OnDelete(DeleteBehavior.Cascade);
         });
     }

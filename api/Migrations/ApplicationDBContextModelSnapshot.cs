@@ -220,6 +220,46 @@ namespace api.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("api.Models.Group", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AppUserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AppUserId", "Name")
+                        .IsUnique();
+
+                    b.ToTable("Groups");
+                });
+
+            modelBuilder.Entity("api.Models.GroupTeam", b =>
+                {
+                    b.Property<int>("GroupId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TeamId")
+                        .HasColumnType("int");
+
+                    b.HasKey("GroupId", "TeamId");
+
+                    b.HasIndex("TeamId");
+
+                    b.ToTable("GroupTeams");
+                });
+
             modelBuilder.Entity("api.Models.Member", b =>
                 {
                     b.Property<int>("Id")
@@ -366,6 +406,36 @@ namespace api.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("api.Models.Group", b =>
+                {
+                    b.HasOne("api.Models.AppUser", "AppUser")
+                        .WithMany()
+                        .HasForeignKey("AppUserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("AppUser");
+                });
+
+            modelBuilder.Entity("api.Models.GroupTeam", b =>
+                {
+                    b.HasOne("api.Models.Group", "Group")
+                        .WithMany("GroupTeams")
+                        .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("api.Models.Team", "Team")
+                        .WithMany("GroupTeams")
+                        .HasForeignKey("TeamId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Group");
+
+                    b.Navigation("Team");
+                });
+
             modelBuilder.Entity("api.Models.Member", b =>
                 {
                     b.HasOne("api.Models.Team", "Team")
@@ -399,8 +469,15 @@ namespace api.Migrations
                     b.Navigation("AppUser");
                 });
 
+            modelBuilder.Entity("api.Models.Group", b =>
+                {
+                    b.Navigation("GroupTeams");
+                });
+
             modelBuilder.Entity("api.Models.Team", b =>
                 {
+                    b.Navigation("GroupTeams");
+
                     b.Navigation("Members");
                 });
 #pragma warning restore 612, 618

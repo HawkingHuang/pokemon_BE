@@ -15,6 +15,9 @@ public class TeamRequestDto : IValidatableObject
     [Length(1, 6)]
     public List<int> PokemonIds { get; set; } = new List<int>();
 
+    // optional: the groups this team belongs to; leaving it out means no groups
+    public List<int> GroupIds { get; set; } = new List<int>();
+
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
         if (PokemonIds.Any(id => id < 1 || id > MaxPokemonId))

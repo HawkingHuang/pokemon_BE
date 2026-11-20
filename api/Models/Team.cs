@@ -9,4 +9,5 @@ public class Team
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
     public List<Member> Members { get; set; } = new List<Member>();
+    public List<GroupTeam> GroupTeams { get; set; } = new List<GroupTeam>();
 }
