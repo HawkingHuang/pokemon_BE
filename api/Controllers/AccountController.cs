@@ -45,7 +45,8 @@ public class AccountController : ControllerBase
         var result = await _userManager.CreateAsync(appUser, registerDto.Password);
         if (!result.Succeeded) return BadRequest(result.Errors);
 
-        return Ok(await SignInAsync(appUser));
+        var authResponseDto = await SignInAsync(appUser);
+        return Ok(authResponseDto);
     }
 
     [HttpPost("login")]
@@ -58,18 +59,20 @@ public class AccountController : ControllerBase
         if (result.IsLockedOut) return Unauthorized("Too many failed attempts. Try again in a few minutes.");
         if (!result.Succeeded) return Unauthorized("Invalid username or password.");
 
-        return Ok(await SignInAsync(user));
+        var authResponseDto = await SignInAsync(user);
+        return Ok(authResponseDto);
     }
 
     [Authorize]
     [HttpGet("me")]
     public IActionResult Me()
     {
-        return Ok(new CurrentUserDto
+        var currentUserDto = new CurrentUserDto
         {
             Id = User.GetUserId(),
             UserName = User.GetUserName()
-        });
+        };
+        return Ok(currentUserDto);
     }
 
     [HttpPost("refresh")]
@@ -100,7 +103,8 @@ public class AccountController : ControllerBase
         await _refreshTokenRepo.RotateAsync(stored, replacement);
         SetRefreshTokenCookie(newToken, replacement.ExpiresAt);
 
-        return Ok(BuildAuthResponse(user));
+        var authResponseDto = BuildAuthResponse(user);
+        return Ok(authResponseDto);
     }
 
     [HttpPost("logout")]
