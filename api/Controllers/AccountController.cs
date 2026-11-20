@@ -14,7 +14,7 @@ public class AccountController : ControllerBase
 {
     private const string RefreshTokenCookie = "refreshToken";
     private static readonly TimeSpan RefreshTokenLifetime = TimeSpan.FromDays(7);
-    private static readonly TimeSpan ReuseGracePeriod = TimeSpan.FromSeconds(30);
+    private static readonly TimeSpan ReuseGracePeriod = TimeSpan.FromSeconds(10);
 
     private readonly UserManager<AppUser> _userManager;
     private readonly SignInManager<AppUser> _signInManager;
